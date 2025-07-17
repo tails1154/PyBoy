@@ -584,7 +584,8 @@ class PyBoy:
             elif event == WindowEvent.STATE_LOAD:
                 state_path = self.gamerom + ".state"
                 if not os.path.isfile(state_path):
-                    logger.error("State file not found: %s", state_path)
+                    print("State file not found")
+#                    logger.error("State file not found: %s", state_path)
                     continue
                 with open(state_path, "rb") as f:
                     self.mb.load_state(IntIOWrapper(f))

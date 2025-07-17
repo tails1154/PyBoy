@@ -10,7 +10,7 @@ from pyboy.utils import INTR_VBLANK, INTR_LCDC, INTR_TIMER, INTR_SERIAL, INTR_HI
 FLAGC, FLAGH, FLAGN, FLAGZ = range(4, 8)
 
 
-logger = pyboy.logging.get_logger(__name__)
+#logger = pyboy.logging.get_#logger(__name__)
 
 
 class CPU:
@@ -69,7 +69,7 @@ class CPU:
             self.interrupts_flag_register = f.read()
         if state_version >= 12:
             self.cycles = f.read_64bit()
-        logger.debug("State loaded: %s", self.dump_state(""))
+        #logger.debug("State loaded: %s", self.dump_state(""))
 
     def dump_state(self, sym_label):
         opcode_data = [

@@ -14,7 +14,7 @@ from .mbc2 import MBC2
 from .mbc3 import MBC3
 from .mbc5 import MBC5
 
-logger = pyboy.logging.get_logger(__name__)
+#logger = pyboy.logging.get_#logger(__name__)
 
 
 def load_cartridge(filename):
@@ -32,8 +32,8 @@ def load_cartridge(filename):
 
     cart_line = ", ".join([x for x, y in zip(["SRAM", "Battery", "RTC"], cartinfo[1:]) if y])
     cart_name = cartinfo[0].__name__
-    logger.debug("Cartridge type: 0x%0.2x - %s, %s", carttype, cart_name, cart_line)
-    logger.debug("Cartridge size: %d ROM banks of 16KB, %s RAM banks of 8KB", len(rombanks), external_ram_count)
+    #logger.debug("Cartridge type: 0x%0.2x - %s, %s", carttype, cart_name, cart_line)
+    #logger.debug("Cartridge size: %d ROM banks of 16KB, %s RAM banks of 8KB", len(rombanks), external_ram_count)
     cartmeta = CARTRIDGE_TABLE[carttype]
 
     return cartmeta[0](filename, rombanks, external_ram_count, carttype, *cartmeta[1:])
@@ -51,9 +51,9 @@ def load_romfile(filename):
     with open(filename, "rb") as romfile:
         romdata = array("B", romfile.read())
 
-    logger.debug("Loading ROM file: %d bytes", len(romdata))
+    #logger.debug("Loading ROM file: %d bytes", len(romdata))
     if len(romdata) == 0:
-        logger.error("ROM file is empty!")
+        #logger.error("ROM file is empty!")
         raise PyBoyException("Empty ROM file")
 
     banksize = 16 * 1024

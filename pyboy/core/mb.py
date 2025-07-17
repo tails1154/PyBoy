@@ -17,7 +17,7 @@ from pyboy.utils import (
 
 from . import bootrom, cartridge, cpu, interaction, lcd, ram, serial, sound, timer
 
-logger = pyboy.logging.get_logger(__name__)
+#logger = pyboy.logging.get_#logger(__name__)
 
 
 class Motherboard:
@@ -33,20 +33,20 @@ class Motherboard:
         cgb,
         randomize=False,
     ):
-        if bootrom_file is not None:
-            logger.info("Boot-ROM file provided")
+#        if bootrom_file is not None:
+            #logger.info("Boot-ROM file provided")
 
         self.cartridge = cartridge.load_cartridge(gamerom)
-        logger.debug("Cartridge started:\n%s", str(self.cartridge))
+        #logger.debug("Cartridge started:\n%s", str(self.cartridge))
 
         self.bootrom = bootrom.BootROM(bootrom_file, self.cartridge.cgb)
         if self.bootrom.cgb:
-            logger.debug("Boot ROM type auto-detected to %s", ("CGB" if self.bootrom.cgb else "DMG"))
+            #logger.debug("Boot ROM type auto-detected to %s", ("CGB" if self.bootrom.cgb else "DMG"))
             cgb = cgb or True
 
         if cgb is None:
             cgb = self.cartridge.cgb
-            logger.debug("Cartridge type auto-detected to %s", ("CGB" if self.cartridge.cgb else "DMG"))
+            #logger.debug("Cartridge type auto-detected to %s", ("CGB" if self.cartridge.cgb else "DMG"))
 
         self.timer = timer.Timer()
         self.serial = serial.Serial()
@@ -101,7 +101,7 @@ class Motherboard:
             self.lcd.speed_shift = 1 if self.double_speed else 0
             self.sound.tick(self.cpu.cycles)
             self.sound.speed_shift = 1 if self.double_speed else 0
-            logger.debug("CGB double speed is now: %d", self.double_speed)
+            #logger.debug("CGB double speed is now: %d", self.double_speed)
             self.key1 ^= 0b10000001
 
     def breakpoint_add(self, bank, addr):
@@ -155,10 +155,10 @@ class Motherboard:
         return tuple()
 
     def breakpoint_remove(self, bank, addr):
-        logger.debug(f"Breakpoint remove: ({bank}, {addr})")
+        #logger.debug(f"Breakpoint remove: ({bank}, {addr})")
         opcode = self.breakpoints.pop((bank, addr), None)
         if opcode is not None:
-            logger.debug(f"Breakpoint remove: {bank:02x}:{addr:04x} {opcode:02x}")
+            #logger.debug(f"Breakpoint remove: {bank:02x}:{addr:04x} {opcode:02x}")
 
             # Restore opcode
             if addr < 0x100 and bank == -1:
@@ -198,11 +198,11 @@ class Motherboard:
         if opcode is not None:
             # Breakpoint hit
             addr = pc
-            logger.debug("Breakpoint reached: %02x:%04x %02x", bank, addr, opcode)
+            #logger.debug("Breakpoint reached: %02x:%04x %02x", bank, addr, opcode)
             self.breakpoint_waiting = (bank & 0xFF) << 24 | (addr & 0xFFFF) << 8 | (opcode & 0xFF)
-            logger.debug("Breakpoint waiting: %08x", self.breakpoint_waiting)
+            #logger.debug("Breakpoint waiting: %08x", self.breakpoint_waiting)
             return (bank, addr, opcode)
-        logger.debug("Invalid breakpoint reached: %04x", self.cpu.PC)
+        #logger.debug("Invalid breakpoint reached: %04x", self.cpu.PC)
         return (-1, -1, -1)
 
     def breakpoint_reinject(self):
@@ -213,7 +213,7 @@ class Motherboard:
         if bank == 0xFF:
             bank = -1
         addr = (self.breakpoint_waiting >> 8) & 0xFFFF
-        logger.debug("Breakpoint reinjecting: %02x:%02x", bank, addr)
+        #logger.debug("Breakpoint reinjecting: %02x:%02x", bank, addr)
         self.breakpoint_add(bank, addr)
         self.breakpoint_waiting = -1
 
@@ -232,7 +232,7 @@ class Motherboard:
             self.cartridge.stop()
 
     def save_state(self, f):
-        logger.debug("Saving state...")
+        #logger.debug("Saving state...")
         f.write(STATE_VERSION)
         f.write(self.bootrom_enabled)
         f.write(self.key1)
@@ -250,23 +250,23 @@ class Motherboard:
         self.interaction.save_state(f)
         self.serial.save_state(f)
         f.flush()
-        logger.debug("State saved.")
+        #logger.debug("State saved.")
 
     def load_state(self, f):
-        logger.debug("Loading state...")
+        #logger.debug("Loading state...")
         state_version = f.read()
         if state_version >= 2:
-            logger.debug("State version: %d", state_version)
+            #logger.debug("State version: %d", state_version)
             # From version 2 and above, this is the version number
             self.bootrom_enabled = f.read()
         else:
-            logger.debug("State version: 0-1")
+            #logger.debug("State version: 0-1")
             # HACK: The byte wasn't a state version, but the bootrom flag
             self.bootrom_enabled = state_version
 
-        if state_version < STATE_VERSION:
-            logger.warning("Loading state from an older version of PyBoy. This might cause compatibility issues.")
-        elif state_version > STATE_VERSION:
+#        if state_version < STATE_VERSION:
+            #logger.warning("Loading state from an older version of PyBoy. This might cause compatibility issues.")
+        if state_version > STATE_VERSION:
             raise PyBoyException("Cannot load state from a newer version of PyBoy")
 
         if state_version >= 8:
@@ -297,7 +297,7 @@ class Motherboard:
         if state_version >= 15:
             self.serial.load_state(f, state_version)
         f.flush()
-        logger.debug("State loaded.")
+        #logger.debug("State loaded.")
 
     ###################################################################
     # Coordinator
@@ -459,16 +459,16 @@ class Motherboard:
             elif self.cgb and i == 0xFF6B:
                 return self.lcd.ocpd.get()
             elif self.cgb and i == 0xFF51:
-                # logger.debug("HDMA1 is not readable")
+                # #logger.debug("HDMA1 is not readable")
                 return 0x00  # Not readable
             elif self.cgb and i == 0xFF52:
-                # logger.debug("HDMA2 is not readable")
+                # #logger.debug("HDMA2 is not readable")
                 return 0x00  # Not readable
             elif self.cgb and i == 0xFF53:
-                # logger.debug("HDMA3 is not readable")
+                # #logger.debug("HDMA3 is not readable")
                 return 0x00  # Not readable
             elif self.cgb and i == 0xFF54:
-                # logger.debug("HDMA4 is not readable")
+                # #logger.debug("HDMA4 is not readable")
                 return 0x00  # Not readable
             elif self.cgb and i == 0xFF55:
                 return self.hdma.hdma5 & 0xFF
@@ -484,7 +484,7 @@ class Motherboard:
         elif i == 0xFFFF:  # Interrupt Enable Register
             return self.cpu.interrupts_enabled_register
         # else:
-        #     logger.critical("Memory access violation. Tried to read: %0.4x", i)
+        #     #logger.critical("Memory access violation. Tried to read: %0.4x", i)
 
     def setitem(self, i, value):
         if 0x0000 <= i < 0x4000:  # 16kB ROM bank #0
@@ -603,7 +603,7 @@ class Motherboard:
             self.cpu.bail = True
         elif 0xFF4C <= i < 0xFF80:  # Empty but unusable for I/O
             if self.bootrom_enabled and i == 0xFF50 and (value == 0x1 or value == 0x11):
-                logger.debug("Bootrom disabled!")
+                #logger.debug("Bootrom disabled!")
                 self.bootrom_enabled = False
                 self.cpu.bail = True
             # CGB registers
@@ -643,7 +643,7 @@ class Motherboard:
             self.cpu.interrupts_enabled_register = value
             self.cpu.bail = True
         # else:
-        #     logger.critical("Memory access violation. Tried to write: 0x%0.2x to 0x%0.4x", value, i)
+        #     #logger.critical("Memory access violation. Tried to write: 0x%0.2x to 0x%0.4x", value, i)
 
     def transfer_DMA(self, src):
         # http://problemkaputt.de/pandocs.htm#lcdoamdmatransfers
