@@ -4,6 +4,11 @@
 #
 
 from pyboy.utils import MAX_CYCLES
+#from flask import Flak, request
+
+app = Flask(__name__)
+
+
 
 CYCLES_8192HZ = 128
 
@@ -21,7 +26,7 @@ class Serial:
 
     def set_SB(self, value):
         # Always 0xFF when cable is disconnected. Connecting is not implemented yet.
-        self.SB = 0xFF
+        self.SB = hex(int(value, 16))
 
     def set_SC(self, value):  # cgb, double_speed
         self.SC = value
@@ -34,7 +39,7 @@ class Serial:
             self.clock_target = self.clock + 8 * CYCLES_8192HZ
         else:
             # Will never complete, as there is no connection
-            self.transfer_enabled = 0  # Technically it is enabled, but no reason to track it.
+            self.transfer_enabled = 1  # Technically it is enabled, but no reason to track it.
             self.clock_target = MAX_CYCLES
         self._cycles_to_interrupt = self.clock_target - self.clock
 
